@@ -1,0 +1,36 @@
+{
+  "tasks": [
+    {
+      "id": "sample-1",
+      "title": "Configure o Notion Integration",
+      "description": "Siga as instruções no README para conectar seu Notion",
+      "status": "pending",
+      "priority": "high",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "tags": ["setup"],
+      "notionUrl": "https://notion.so",
+      "xpReward": 100
+    }
+  ],
+  "playerStats": {
+    "level": 1,
+    "currentXp": 0,
+    "xpToNextLevel": 100,
+    "totalXpEarned": 0,
+    "tasksCompleted": 0,
+    "currentStreak": 0,
+    "longestStreak": 0,
+    "title": "Novato"
+  },
+  "dailyQuests": [
+    {
+      "id": "daily-1",
+      "title": "Completar 3 tarefas",
+      "target": 3,
+      "current": 0,
+      "xpReward": 50,
+      "completed": false
+    }
+  ],
+  "lastSync": "Aguardando configuração..."
+}

@@ -1,0 +1,146 @@
+.panel {
+  max-width: 400px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.goal {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--success);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.allComplete {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--success);
+  padding: 4px 12px;
+  background: rgba(0, 210, 106, 0.2);
+  border: 1px solid var(--success);
+  border-radius: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(0, 210, 106, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 210, 106, 0.5);
+  }
+}
+
+.questList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.quest {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.quest.completed {
+  border-color: var(--success);
+  background: rgba(0, 210, 106, 0.05);
+}
+
+.questInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.questStatus {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--warning);
+  text-transform: uppercase;
+}
+
+.quest.completed .questStatus {
+  color: var(--success);
+}
+
+.questTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.questProgress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.questProgress > *:first-child {
+  flex: 1;
+}
+
+.questCount {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+
+.checkmark {
+  color: var(--success);
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid var(--warning);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.warningIcon {
+  font-size: 1rem;
+}
+
+.warning span:last-child {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--warning);
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.timer {
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.timer svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+}
