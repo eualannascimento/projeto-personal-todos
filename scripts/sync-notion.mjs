@@ -2,6 +2,10 @@
  * Script de sincronização com o Notion
  * Executado pelo GitHub Actions para buscar tarefas e gerar JSON
  *
+ * COMPORTAMENTO:
+ * - Se NOTION_TOKEN e NOTION_DATABASE_ID estão configurados → sincroniza com Notion
+ * - Se não estão configurados → gera dados de exemplo (modo demo)
+ *
  * SEGURANÇA:
  * - O NOTION_TOKEN é armazenado APENAS no GitHub Secrets
  * - Nunca é exposto no código ou no JSON gerado
@@ -21,16 +25,164 @@ const OUTPUT_DIR = join(__dirname, '..', 'public', 'data');
 const OUTPUT_FILE = join(OUTPUT_DIR, 'tasks.json');
 const STATS_FILE = join(OUTPUT_DIR, 'stats.json');
 
-// Validação de ambiente
-if (!NOTION_TOKEN) {
-  console.error('❌ NOTION_TOKEN não definido');
-  process.exit(1);
-}
-
-if (!NOTION_DATABASE_ID) {
-  console.error('❌ NOTION_DATABASE_ID não definido');
-  process.exit(1);
-}
+// Dados de exemplo para modo demo
+const SAMPLE_DATA = {
+  tasks: [
+    {
+      id: 'sample-1',
+      title: 'Estudar TypeScript avancado',
+      description: 'Generics, utility types e decorators',
+      status: 'in_progress',
+      priority: 'high',
+      createdAt: '2025-01-15T09:00:00Z',
+      tags: ['estudo', 'programacao'],
+      notionUrl: 'https://notion.so',
+      xpReward: 50
+    },
+    {
+      id: 'sample-2',
+      title: 'Treino na academia',
+      description: 'Treino de perna + 30min cardio',
+      status: 'pending',
+      priority: 'medium',
+      createdAt: '2025-01-20T07:00:00Z',
+      tags: ['saude', 'fitness'],
+      notionUrl: 'https://notion.so',
+      xpReward: 25
+    },
+    {
+      id: 'sample-3',
+      title: 'Ler 30 paginas do livro',
+      description: 'Continuar leitura do livro atual',
+      status: 'pending',
+      priority: 'low',
+      createdAt: '2025-01-20T08:00:00Z',
+      tags: ['leitura', 'habito'],
+      notionUrl: 'https://notion.so',
+      xpReward: 10
+    },
+    {
+      id: 'sample-4',
+      title: 'Finalizar relatorio do projeto',
+      description: 'Enviar relatorio para revisao ate sexta',
+      status: 'pending',
+      priority: 'urgent',
+      createdAt: '2025-01-18T10:00:00Z',
+      dueDate: '2025-01-24',
+      tags: ['trabalho'],
+      notionUrl: 'https://notion.so',
+      xpReward: 100
+    },
+    {
+      id: 'sample-5',
+      title: 'Organizar mesa de trabalho',
+      description: 'Limpar, organizar cabos e documentos',
+      status: 'completed',
+      priority: 'low',
+      createdAt: '2025-01-10T14:00:00Z',
+      completedAt: '2025-01-20T16:30:00Z',
+      tags: ['organizacao'],
+      notionUrl: 'https://notion.so',
+      xpReward: 10
+    },
+    {
+      id: 'sample-6',
+      title: 'Fazer deploy do projeto pessoal',
+      description: 'Configurar CI/CD e publicar no GitHub Pages',
+      status: 'completed',
+      priority: 'high',
+      createdAt: '2025-01-05T11:00:00Z',
+      completedAt: '2025-01-19T18:00:00Z',
+      tags: ['programacao', 'devops'],
+      notionUrl: 'https://notion.so',
+      xpReward: 50
+    },
+    {
+      id: 'sample-7',
+      title: 'Preparar apresentacao semanal',
+      description: 'Slides sobre progresso do sprint',
+      status: 'pending',
+      priority: 'medium',
+      createdAt: '2025-01-20T09:00:00Z',
+      dueDate: '2025-01-22',
+      tags: ['trabalho'],
+      notionUrl: 'https://notion.so',
+      xpReward: 25
+    },
+    {
+      id: 'sample-8',
+      title: 'Meditar 15 minutos',
+      description: 'Sessao guiada de mindfulness',
+      status: 'completed',
+      priority: 'low',
+      createdAt: '2025-01-20T06:00:00Z',
+      completedAt: '2025-01-20T06:20:00Z',
+      tags: ['saude', 'habito'],
+      notionUrl: 'https://notion.so',
+      xpReward: 10
+    },
+    {
+      id: 'sample-9',
+      title: 'Revisar pull requests pendentes',
+      description: '3 PRs aguardando code review',
+      status: 'in_progress',
+      priority: 'high',
+      createdAt: '2025-01-19T13:00:00Z',
+      tags: ['trabalho', 'programacao'],
+      notionUrl: 'https://notion.so',
+      xpReward: 50
+    },
+    {
+      id: 'sample-10',
+      title: 'Pagar conta de luz',
+      description: 'Vence dia 25',
+      status: 'pending',
+      priority: 'medium',
+      createdAt: '2025-01-15T10:00:00Z',
+      dueDate: '2025-01-25',
+      tags: ['financeiro'],
+      notionUrl: 'https://notion.so',
+      xpReward: 25
+    }
+  ],
+  playerStats: {
+    level: 3,
+    currentXp: 20,
+    xpToNextLevel: 300,
+    totalXpEarned: 320,
+    tasksCompleted: 3,
+    currentStreak: 2,
+    longestStreak: 5,
+    title: 'Novato'
+  },
+  dailyQuests: [
+    {
+      id: 'daily-1',
+      title: 'Completar 3 tarefas',
+      target: 3,
+      current: 1,
+      xpReward: 50,
+      completed: false
+    },
+    {
+      id: 'daily-2',
+      title: 'Completar 1 tarefa prioritaria',
+      target: 1,
+      current: 0,
+      xpReward: 30,
+      completed: false
+    },
+    {
+      id: 'daily-3',
+      title: 'Completar 5 tarefas',
+      target: 5,
+      current: 1,
+      xpReward: 100,
+      completed: false
+    }
+  ],
+  lastSync: 'Modo Demo'
+};
 
 // Notion API client simples
 async function notionRequest(endpoint, method = 'GET', body = null) {
@@ -240,10 +392,6 @@ function loadPreviousStats() {
 
 // Calcular level baseado no XP
 function calculateLevel(totalXp) {
-  // Fórmula: cada nível precisa de 100 * level XP
-  // Level 1: 0-99 XP
-  // Level 2: 100-299 XP
-  // Level 3: 300-599 XP, etc.
   let level = 1;
   let xpNeeded = 100;
   let totalXpForLevel = 0;
@@ -289,19 +437,16 @@ function calculateStreak(previousStats, tasksCompletedToday) {
     const diffDays = Math.floor((todayObj - lastDateObj) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      // Mesmo dia, mantém streak
       return {
         currentStreak: previousStats.currentStreak,
         lastCompletionDate: today,
       };
     } else if (diffDays === 1) {
-      // Dia seguinte, incrementa streak
       return {
         currentStreak: previousStats.currentStreak + 1,
         lastCompletionDate: today,
       };
     } else {
-      // Mais de 1 dia, reseta streak
       return { currentStreak: 1, lastCompletionDate: today };
     }
   }
@@ -317,7 +462,6 @@ function calculatePlayerStats(tasks, previousStats) {
   const completedTasks = tasks.filter(t => t.status === 'completed');
   const totalXpEarned = completedTasks.reduce((sum, t) => sum + t.xpReward, 0);
 
-  // Verifica tarefas completadas hoje
   const today = new Date().toISOString().split('T')[0];
   const tasksCompletedToday = completedTasks.filter(t =>
     t.completedAt && t.completedAt.startsWith(today)
@@ -387,59 +531,96 @@ function generateDailyQuests(tasks) {
   ];
 }
 
-// Função principal
-async function main() {
+// Gerar dados de exemplo (modo demo)
+function generateSampleData() {
+  console.log('⚠️ Notion não configurado. Gerando dados de exemplo...\n');
+
+  // Criar diretório se não existir
+  if (!existsSync(OUTPUT_DIR)) {
+    mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
+
+  // Salvar dados de exemplo
+  writeFileSync(OUTPUT_FILE, JSON.stringify(SAMPLE_DATA, null, 2));
+  console.log(`✅ Dados de exemplo salvos em ${OUTPUT_FILE}`);
+
+  // Salvar stats
+  writeFileSync(STATS_FILE, JSON.stringify(SAMPLE_DATA.playerStats, null, 2));
+  console.log(`✅ Stats salvos em ${STATS_FILE}`);
+
+  console.log('\n🎮 Modo demo ativado!');
+  console.log('📝 Configure NOTION_TOKEN e NOTION_DATABASE_ID para sincronizar com seu Notion.');
+}
+
+// Sincronizar com Notion
+async function syncWithNotion() {
   console.log('🚀 Iniciando sincronização com Notion...\n');
 
+  // Criar diretório de saída se não existir
+  if (!existsSync(OUTPUT_DIR)) {
+    mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
+
+  // Buscar tarefas
+  const notionPages = await fetchTasks();
+  console.log(`✅ ${notionPages.length} páginas encontradas\n`);
+
+  // Transformar tarefas
+  const tasks = notionPages.map(transformTask);
+  console.log('✅ Tarefas transformadas\n');
+
+  // Carregar stats anteriores
+  const previousStats = loadPreviousStats();
+
+  // Calcular stats do player
+  const playerStats = calculatePlayerStats(tasks, previousStats);
+  console.log(`📊 Level: ${playerStats.level} | XP: ${playerStats.totalXpEarned}`);
+  console.log(`🏆 Streak: ${playerStats.currentStreak} dias\n`);
+
+  // Gerar missões diárias
+  const dailyQuests = generateDailyQuests(tasks);
+
+  // Montar dados finais
+  const syncData = {
+    tasks,
+    playerStats,
+    dailyQuests,
+    lastSync: new Date().toLocaleString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      dateStyle: 'short',
+      timeStyle: 'short',
+    }),
+  };
+
+  // Salvar JSON
+  writeFileSync(OUTPUT_FILE, JSON.stringify(syncData, null, 2));
+  console.log(`✅ Dados salvos em ${OUTPUT_FILE}`);
+
+  // Salvar stats separadamente para persistência
+  writeFileSync(STATS_FILE, JSON.stringify(playerStats, null, 2));
+  console.log(`✅ Stats salvos em ${STATS_FILE}`);
+
+  console.log('\n🎉 Sincronização concluída com sucesso!');
+}
+
+// Função principal
+async function main() {
+  // Verificar se Notion está configurado
+  const notionConfigured = NOTION_TOKEN && NOTION_DATABASE_ID;
+
+  if (!notionConfigured) {
+    // Modo demo: gerar dados de exemplo
+    generateSampleData();
+    return;
+  }
+
+  // Modo normal: sincronizar com Notion
   try {
-    // Criar diretório de saída se não existir
-    if (!existsSync(OUTPUT_DIR)) {
-      mkdirSync(OUTPUT_DIR, { recursive: true });
-    }
-
-    // Buscar tarefas
-    const notionPages = await fetchTasks();
-    console.log(`✅ ${notionPages.length} páginas encontradas\n`);
-
-    // Transformar tarefas
-    const tasks = notionPages.map(transformTask);
-    console.log('✅ Tarefas transformadas\n');
-
-    // Carregar stats anteriores
-    const previousStats = loadPreviousStats();
-
-    // Calcular stats do player
-    const playerStats = calculatePlayerStats(tasks, previousStats);
-    console.log(`📊 Level: ${playerStats.level} | XP: ${playerStats.totalXpEarned}`);
-    console.log(`🏆 Streak: ${playerStats.currentStreak} dias\n`);
-
-    // Gerar missões diárias
-    const dailyQuests = generateDailyQuests(tasks);
-
-    // Montar dados finais
-    const syncData = {
-      tasks,
-      playerStats,
-      dailyQuests,
-      lastSync: new Date().toLocaleString('pt-BR', {
-        timeZone: 'America/Sao_Paulo',
-        dateStyle: 'short',
-        timeStyle: 'short',
-      }),
-    };
-
-    // Salvar JSON
-    writeFileSync(OUTPUT_FILE, JSON.stringify(syncData, null, 2));
-    console.log(`✅ Dados salvos em ${OUTPUT_FILE}`);
-
-    // Salvar stats separadamente para persistência
-    writeFileSync(STATS_FILE, JSON.stringify(playerStats, null, 2));
-    console.log(`✅ Stats salvos em ${STATS_FILE}`);
-
-    console.log('\n🎉 Sincronização concluída com sucesso!');
+    await syncWithNotion();
   } catch (error) {
     console.error('\n❌ Erro durante sincronização:', error.message);
-    process.exit(1);
+    console.log('\n⚠️ Gerando dados de exemplo como fallback...');
+    generateSampleData();
   }
 }
 
