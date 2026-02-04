@@ -3,7 +3,7 @@ import { useTaskData } from './hooks/useTaskData';
 import './App.css';
 
 function App() {
-  const { data, isLoading, refresh } = useTaskData();
+  const { data, isLoading, isSample, refresh } = useTaskData();
 
   if (isLoading) {
     return (
@@ -40,15 +40,23 @@ function App() {
         isLoading={isLoading}
       />
 
+      {isSample && (
+        <div className="demo-banner">
+          <span className="demo-banner-icon">!</span>
+          <span>
+            MODO DEMO — Exibindo tarefas de exemplo.
+            Configure o Notion para ver seus dados reais.
+          </span>
+        </div>
+      )}
+
       <main className="main">
         <div className="layout">
-          {/* Left sidebar - Status and Daily Quests */}
           <aside className="sidebar">
             <StatusPanel stats={data.playerStats} />
             <DailyQuests quests={data.dailyQuests} />
           </aside>
 
-          {/* Main content - Quest List */}
           <section className="content">
             <QuestList
               tasks={data.tasks}

@@ -31,6 +31,35 @@
   min-width: 0;
 }
 
+/* Demo banner */
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 24px;
+  background: linear-gradient(90deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.15));
+  border-bottom: 1px solid rgba(255, 193, 7, 0.3);
+  color: var(--warning);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.demo-banner-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--warning);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
 /* Loading state */
 .loading {
   display: flex;

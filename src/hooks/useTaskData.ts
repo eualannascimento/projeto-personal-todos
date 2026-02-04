@@ -7,11 +7,10 @@ const DATA_URL = './data/tasks.json';
 export function useTaskData() {
   const [data, setData] = useState<SyncData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isSample, setIsSample] = useState(false);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await fetch(DATA_URL, {
@@ -19,15 +18,20 @@ export function useTaskData() {
       });
 
       if (!response.ok) {
-        throw new Error('Dados nao encontrados. Use os dados de exemplo.');
+        throw new Error('Dados nao encontrados');
       }
 
       const jsonData: SyncData = await response.json();
+
+      if (!jsonData.tasks || jsonData.tasks.length === 0) {
+        throw new Error('Nenhuma tarefa encontrada');
+      }
+
       setData(jsonData);
+      setIsSample(false);
     } catch {
-      // Se falhar, usa dados de exemplo
-      console.log('Usando dados de exemplo');
       setData(sampleData as SyncData);
+      setIsSample(true);
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +48,7 @@ export function useTaskData() {
   return {
     data,
     isLoading,
-    error,
+    isSample,
     refresh
   };
 }
