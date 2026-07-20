@@ -36,3 +36,9 @@ Thumbs.db
 
 # Test coverage
 coverage
+
+# Diarios de execucao do workflow SDD (estado transitorio)
+.docs/journal/
+
+# Worktrees do Claude Code
+.claude/worktrees/
